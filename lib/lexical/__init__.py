@@ -1,2 +1,1 @@
-import util
-import lexical
+from . import lexical_analysis

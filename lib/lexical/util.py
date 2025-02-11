@@ -8,18 +8,21 @@ class token:
 
     def __eq__(self, t) -> bool:
         return t.obj == self.obj
-    
+
+    def __str__(self) -> str:
+        return f'<\'{self.obj}\', {self.type}, {self.id}>'
+
     def same_type(self, t) -> bool:
         return self.type == t.type
     
-class token_list:
+class token_table:
     def __init__(self):
-        self.l = {
+        self.table = {
             'identifier': [],
             'integer': [],
             'string': [],
             'keyword': [],
-            'operators': [],
+            'operator': [],
             'punc': [],
         }
         self.id_boundary = {
@@ -27,7 +30,7 @@ class token_list:
             'integer': [1, 2],
             'string': [2, 3],
             'keyword': [3, 10],
-            'operators': [10, 19],
+            'operator': [10, 19],
             'punc': [20, 27],
         }
         self.current_id = {
@@ -35,54 +38,109 @@ class token_list:
             'integer': 1,
             'string': 2,
             'keyword': 3,
-            'operators': 10,
+            'operator': 10,
             'punc': 20,
         }
-        self.allow_inc = {
+        self.allow_increment = {
             'identifier': False,
             'integer': False,
             'string': False,
             'keyword': True,
-            'operators': True,
+            'operator': True,
             'punc': True,
         }
 
-    def push(self, t: token) -> bool:
-        # return True if @t successfully push into the list
+    def __str__(self):
+        ret = ''
+        for x in self.table:
+            ret += f'{x}: ['+ ''.join([tok.__str__() + ', ' for tok in self.table[x]]) + ']\n'
+        return ret
+
+    def is_exist(self, tok: token) -> token | bool:
+        # check if @tok already inside this token table
+        # if such token exist, the token inside the table is returned, otherwise False is returned
+
+        for t in self.table[tok.type]:
+            if t == tok:
+                return t, True
+        
+        return None, False
+
+    def insert(self, t: token) -> bool:
+        # return True if @t successfully insert into the list
 
         # assigne id to @t
         if not self.assign_token_id(t):
             return False
         
-        # check if @t already in the list
-        for x in self.l[t.type]:
-            if x == t:
-                return False
-
         # push @t to the list
-        self.l[t.type].append(t)
+        _, exist = self.is_exist(t)
+        if not exist:
+            self.table[t.type].append(t)
         return True
      
     def increment_token_id(self, type: str) -> int:
         # return a new token type id if the id is increment successfully
+        # it only allows @type's id is inside the boundary and allow to increment the token id
 
         if type not in self.current_id.keys():
+            print(f'Error: no such token type, type: {type}')
             return -1
         
         if not self.allow_increment[type]:
             return self.current_id[type]
 
-        if self.current_id[type] + 1 >= self.id_boundary[type]:
+        if self.current_id[type] + 1 >= self.id_boundary[type][1]:
+            print('Error: all id of type {type} are assigned')
             return -1
         
         self.current_id[type] += 1
         return self.current_id[type]
 
-    def assign_token_id(self, t: token) -> bool:
+    def assign_token_id(self, tok: token) -> bool:
         # return True if the token is assigned an id successfully
+        # if @tok already inside this token table, the token's id is copied from the one inside the token table
 
-        new_id = self.increment_token_id(t.type)
+        t, exist = self.is_exist(tok)
+        if exist:
+            tok.id = t.id
+            return True
+ 
+        new_id = self.increment_token_id(tok.type)
         if new_id == -1:
             return False
         
-        t.id = new_id
+        tok.id = new_id
+        return True
+
+class token_list:
+    def __init__(self):
+        self.list = []
+        self.pt = 0
+
+    def __str__(self) -> str:
+        ret = ''.join([tok.__str__() + '\n' for tok in self.list])
+        return ret
+    
+    def get_list(self):
+        return self.list
+
+    def push(self, t: token) -> bool:
+
+        # return True if @t is successfully insert into the list
+
+        if not isinstance(t, token):
+            return False
+        self.list.append(t)
+        return True
+
+    def current(self) -> token | None:
+
+        # this return the current token, and move the pointer forward
+        # if no more token to return, None is returned
+
+        if self.pt >= len(self.list):
+            return None
+        self.pt += 1
+        return self.list[self.pt - 1]
+        

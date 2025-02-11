@@ -1,2 +1,2 @@
 int x = 10;
-int y = 10;
+char y = 'teste';
