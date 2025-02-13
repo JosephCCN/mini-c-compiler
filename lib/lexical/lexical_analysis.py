@@ -9,11 +9,13 @@ class lexical_analysis:
             'identifier': '[_a-zA-Z][_a-zA-Z0-9]*',
             'integer': '[+-]?[0-9]+',
             'string': '".*"',
-            'keyword': 'int|char',
-            'operator': '=',
-            'punc': ';|{|}'
+            'character': '\'.\'',
+            'library': '<.*>',
+            'keyword': 'int|char|string|main|for|while|else if|if|else|return|include|define',
+            'operator': '=|-|\+|\*|\\|>=|<=|>|<|==',
+            'punc': '{|}|;|\(|\)|,|\[|\]|#',
         }
-        self.order = ['keyword', 'identifier', 'string', 'integer', 'operator', 'punc']
+        self.order = ['keyword', 'library', 'identifier', 'string', 'integer', 'character', 'operator', 'punc']
         self.tok_table = token_table()
 
     def run(self, src: str) -> token_list | None:
@@ -39,6 +41,7 @@ class lexical_analysis:
                     src = src[len(obj):]
                     matched = True
                     break
+            
             if not matched:
                 print(f'Error: lexical analysis, {src}')
                 return None

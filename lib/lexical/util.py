@@ -21,6 +21,8 @@ class token_table:
             'identifier': [],
             'integer': [],
             'string': [],
+            'character': [],
+            'library': [],
             'keyword': [],
             'operator': [],
             'punc': [],
@@ -29,22 +31,28 @@ class token_table:
             'identifier': [0, 1],
             'integer': [1, 2],
             'string': [2, 3],
-            'keyword': [3, 10],
-            'operator': [10, 19],
-            'punc': [20, 27],
+            'character': [3, 4],
+            'library': [4, 5],
+            'keyword': [5, 24],
+            'operator': [24, 44],
+            'punc': [44, 64],
         }
         self.current_id = {
             'identifier': 0,
             'integer': 1,
             'string': 2,
-            'keyword': 3,
-            'operator': 10,
-            'punc': 20,
+            'character': 3,
+            'library': 4,
+            'keyword': 5,
+            'operator': 24,
+            'punc': 44,
         }
         self.allow_increment = {
             'identifier': False,
             'integer': False,
             'string': False,
+            'character': False,
+            'library': False,
             'keyword': True,
             'operator': True,
             'punc': True,
@@ -95,7 +103,7 @@ class token_table:
             return -1
         
         self.current_id[type] += 1
-        return self.current_id[type]
+        return self.current_id[type] - 1
 
     def assign_token_id(self, tok: token) -> bool:
         # return True if the token is assigned an id successfully
