@@ -12,7 +12,7 @@ class lexical_analysis:
             'character': '\'.\'',
             'library': '<.*>',
             'keyword': 'int|char|string|main|for|while|else if|if|else|return|include|define',
-            'operator': '=|-|\+|\*|\\|>=|<=|>|<|==',
+            'operator': '=|-|\+|\*|/|>=|<=|>|<|==|&',
             'punc': '{|}|;|\(|\)|,|\[|\]|#',
         }
         self.order = ['keyword', 'library', 'identifier', 'string', 'integer', 'character', 'operator', 'punc']
