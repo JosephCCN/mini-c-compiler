@@ -1,13 +1,18 @@
 package lexical
 
-func GetToken(name string, id int) Token {
+func GetToken(content string, id int) Token {
 	return Token{
-		name: name,
-		id:   id,
+		content: content,
+		id:      id,
 	}
 }
 
 func Run(src string) []Token {
+
+	tokTable := GetTokenTable()
+	tok := GetToken("test", 2)
+	tokTable.Append("int", tok)
+
 	var (
 		tokenList []Token
 	)
