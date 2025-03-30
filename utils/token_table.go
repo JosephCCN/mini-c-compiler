@@ -1,4 +1,4 @@
-package lexical
+package utils
 
 import (
 	"errors"
@@ -15,13 +15,19 @@ func GetTokenTable() TokenTable {
 	return TokenTable{
 		table: make(map[string][]Token),
 		currentId: map[string]int{
-			"integer": 1,
+			"integer":   1,
+			"character": 2,
+			"string":    3,
 		},
 		boundId: map[string]int{
-			"integer": 1,
+			"integer":   1,
+			"character": 2,
+			"string":    3,
 		},
 		allowIncrement: map[string]bool{
-			"integer": false,
+			"integer":   false,
+			"character": false,
+			"string":    false,
 		},
 	}
 }
