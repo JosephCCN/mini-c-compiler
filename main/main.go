@@ -1,30 +1,44 @@
 package main
 
 import (
+	"flag"
 	"fmt"
+	"os"
 
 	"github.com/lexical"
+	"github.com/parser"
 )
 
 func main() {
 
-	// var (
-	// 	srcPath string
-	// )
-	// flag.StringVar(&srcPath, "s", "", "source file path")
-	// flag.Parse()
+	var (
+		srcPath string
+	)
+	flag.StringVar(&srcPath, "s", "", "source file path")
+	flag.Parse()
 
-	// if srcPath == "" {
-	// 	fmt.Println("Missing source")
-	// 	return
+	if srcPath == "" {
+		fmt.Println("Missing source")
+		return
+	}
+
+	src, err := os.ReadFile(srcPath)
+	if err != nil {
+		fmt.Println(err)
+		return
+	}
+
+	tokenList, err := lexical.Run(string(src))
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println(tokenList)
+	// for _, tok := range tokenList.GetList() {
+	// 	if tok.IsInt() {
+	// 		fmt.Println("yes")
+	// 	}
 	// }
 
-	// src, err := os.ReadFile(srcPath)
-	// if err != nil {
-	// 	fmt.Println(err)
-	// 	return
-	// }
-
-	fmt.Println(lexical.Run(string("-12")))
+	fmt.Println(parser.Start(&tokenList))
 
 }
