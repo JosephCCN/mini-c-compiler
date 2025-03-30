@@ -33,3 +33,7 @@ func (tok Token) IsString() bool {
 func (tok Token) IsChar() bool {
 	return tok.tokType == "character"
 }
+
+func (tok Token) IsIdentifier() bool {
+	return tok.tokType == "identifier"
+}

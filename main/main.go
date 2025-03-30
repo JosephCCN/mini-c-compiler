@@ -6,7 +6,6 @@ import (
 	"os"
 
 	"github.com/lexical"
-	"github.com/parser"
 )
 
 func main() {
@@ -39,6 +38,6 @@ func main() {
 	// 	}
 	// }
 
-	fmt.Println(parser.Start(&tokenList))
+	// fmt.Println(parser.Start(&tokenList))
 
 }

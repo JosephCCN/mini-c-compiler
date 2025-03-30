@@ -25,11 +25,15 @@ func Run(src string) (utils.TokenList, error) {
 	tokenList := utils.GetTokenList()
 
 	regex := map[string]*regexp.Regexp{
-		"integer":   regexp.MustCompile("^[+-]?[0-9]+"),
-		"character": regexp.MustCompile("^'.'"),
-		"string":    regexp.MustCompile("^\".*\"?"),
+		"integer":    regexp.MustCompile("^[+-]?[0-9]+"),
+		"character":  regexp.MustCompile("^'.'"),
+		"string":     regexp.MustCompile("^\".*\"?"),
+		"identifier": regexp.MustCompile("^[_a-zA-Z][_a-zA-Z0-9]*"),
+		"keyword":    regexp.MustCompile("^int|^char|^string|^main|^for|^while|^else if|^if|^else|^return|^include|^define"),
+		"operator":   regexp.MustCompile(`^=|^-|^\+|^\*|^/|^>=|^<=|^>|^<|^==`),
+		"punc":       regexp.MustCompile(`^{|^}|^;|^\(|^\)|^,|^\[|^\]`),
 	}
-	order := []string{"integer", "string", "character"}
+	order := []string{"keyword", "identifier", "integer", "string", "character", "operator", "punc"}
 
 	for len(src) > 0 {
 		src = strings.TrimSpace(src)

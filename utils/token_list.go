@@ -36,3 +36,28 @@ func (self *TokenList) Pop() Token {
 func (self *TokenList) GetList() []Token {
 	return self.list
 }
+
+func (self *TokenList) Match(content string) bool {
+	tok := self.Pop()
+	return tok.Match(content)
+}
+
+func (self *TokenList) IsInt() bool {
+	tok := self.Pop()
+	return tok.IsInt()
+}
+
+func (self *TokenList) IsChar() bool {
+	tok := self.Pop()
+	return tok.IsChar()
+}
+
+func (self *TokenList) IsString() bool {
+	tok := self.Pop()
+	return tok.IsString()
+}
+
+func (self *TokenList) IsIdentifier() bool {
+	tok := self.Pop()
+	return tok.IsIdentifier()
+}
