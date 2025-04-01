@@ -26,6 +26,10 @@ func (tok Token) IsInt() bool {
 	return tok.tokType == "integer"
 }
 
+func (tok Token) IsDouble() bool {
+	return tok.tokType == "double"
+}
+
 func (tok Token) IsString() bool {
 	return tok.tokType == "string"
 }

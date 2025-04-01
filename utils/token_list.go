@@ -47,6 +47,11 @@ func (self *TokenList) IsInt() bool {
 	return tok.IsInt()
 }
 
+func (self *TokenList) IsDouble() bool {
+	tok := self.Pop()
+	return tok.IsDouble()
+}
+
 func (self *TokenList) IsChar() bool {
 	tok := self.Pop()
 	return tok.IsChar()

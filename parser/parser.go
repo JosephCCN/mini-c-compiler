@@ -20,7 +20,7 @@ func ex_declaration(tokList *utils.TokenList) bool {
 		return true
 	}
 	tokList = tmp.Copy()
-	return declaration(tokList)
+	return var_declaration(tokList)
 }
 
 func function(tokList *utils.TokenList) bool {
@@ -41,6 +41,16 @@ func types(tokList *utils.TokenList) bool {
 }
 
 func block_statement(tokList *utils.TokenList) bool {
+	tmp := tokList.Copy()
+	if statement(tokList) {
+		return true
+	}
+	tokList = tmp.Copy()
+	return block_statement(tokList) && statement(tokList)
+}
+
+// LL(1) parsing
+func statement(tokList *utils.TokenList) bool {
 	return true
 }
 
@@ -48,6 +58,35 @@ func return_statement(tokList *utils.TokenList) bool {
 	return true
 }
 
-func declaration(tokList *utils.TokenList) bool {
+func var_declaration(tokList *utils.TokenList) bool {
+	return types(tokList) && assignment(tokList)
+}
+
+func type_ep(tokList *utils.TokenList) bool {
+	tmp := tokList.Copy()
+	if tokList.IsInt() {
+		return true
+	}
+	if tokList.IsDouble() {
+		return true
+	}
+	tokList = tmp.Copy()
+	if tokList.IsChar() {
+		return true
+	}
+	tokList = tmp.Copy()
+	return tokList.IsString()
+}
+
+func assignment(tokList *utils.TokenList) bool {
+	tmp := tokList.Copy()
+	if tokList.IsIdentifier() && tokList.Match("=") && tokList.IsIdentifier() {
+		return true
+	}
+	tokList = tmp.Copy()
+	return tokList.IsIdentifier() && tokList.Match("=") && expressions(tokList)
+}
+
+func if_statement(tokList *utils.TokenList) bool {
 	return true
 }
