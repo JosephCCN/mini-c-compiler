@@ -13,7 +13,7 @@ func expressions(tokList *utils.TokenList) bool {
 	if logic_experssion(tokList) {
 		return true
 	}
-	return tokList.IsString()
+	return term(tokList)
 }
 
 func math_experssion(tokList *utils.TokenList) bool {
@@ -80,6 +80,10 @@ func term(tokList *utils.TokenList) bool {
 	}
 	tokList = tmp.Copy()
 	if tokList.IsDouble() {
+		return true
+	}
+	tokList = tmp.Copy()
+	if tokList.IsString() {
 		return true
 	}
 	tokList = tmp.Copy()
