@@ -26,6 +26,7 @@ func Run(src string) (utils.TokenList, error) {
 
 	regex := map[string]*regexp.Regexp{
 		"integer":    regexp.MustCompile("^[+-]?[0-9]+"),
+		"double":     regexp.MustCompile("^[-+]?[0-9]*\\.?[0-9]+"),
 		"character":  regexp.MustCompile("^'.'"),
 		"string":     regexp.MustCompile("^\".*\"?"),
 		"identifier": regexp.MustCompile("^[_a-zA-Z][_a-zA-Z0-9]*"),
@@ -33,7 +34,7 @@ func Run(src string) (utils.TokenList, error) {
 		"operator":   regexp.MustCompile(`^=|^-|^\+|^\*|^/|^>=|^<=|^>|^<|^==`),
 		"punc":       regexp.MustCompile(`^{|^}|^;|^\(|^\)|^,|^\[|^\]`),
 	}
-	order := []string{"keyword", "identifier", "integer", "string", "character", "operator", "punc"}
+	order := []string{"keyword", "identifier", "double", "integer", "string", "character", "operator", "punc"}
 
 	for len(src) > 0 {
 		src = strings.TrimSpace(src)
