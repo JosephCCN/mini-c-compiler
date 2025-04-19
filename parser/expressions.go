@@ -5,138 +5,178 @@ import (
 )
 
 func expressions(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	if math_experssion(tokList) {
 		return true
 	}
-	tokList = tmp.Copy()
+	*tokList = tmp.ShallowCopy()
 	if logic_experssion(tokList) {
 		return true
 	}
 	return term(tokList)
 }
 
-func math_experssion(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if math_experssion2(tokList) {
-		return true
+func math_experssion_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	t := op1(tokList) && math_experssion2(tokList)
+	if t {
+		math_experssion_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return math_experssion(tokList) && op1(tokList) && math_experssion2(tokList)
+	return true
+}
+
+func math_experssion(tokList *utils.TokenList) bool {
+	return math_experssion2(tokList) && math_experssion_(tokList)
+}
+
+func math_experssion2_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	t := op2(tokList) && term(tokList)
+	if t {
+		math_experssion2_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
+	}
+	return true
 }
 
 func math_experssion2(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if term(tokList) {
-		return true
+	return term(tokList) && math_experssion2_(tokList)
+}
+
+func logic_experssion_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	t := bool_op(tokList) && logic_experssion2(tokList)
+	if t {
+		logic_experssion_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return math_experssion2(tokList) && op2(tokList) && term(tokList)
+	return true
 }
 
 func logic_experssion(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if tokList.Match("!") && logic_experssion(tokList) {
+	tmp := tokList.ShallowCopy()
+	if logic_experssion2(tokList) && logic_experssion_(tokList) {
 		return true
 	}
-	tokList = tmp.Copy()
-	if logic_experssion2(tokList) {
-		return true
+	*tokList = tmp.ShallowCopy()
+	return tokList.Match("!") && logic_experssion(tokList) && logic_experssion_(tokList)
+}
+
+func logic_experssion2_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	t := bitwise_op(tokList) && logic_experssion3(tokList)
+	if t {
+		logic_experssion2_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return logic_experssion(tokList) && bool_op(tokList) && logic_experssion2(tokList)
+	return true
 }
 
 func logic_experssion2(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if logic_experssion3(tokList) {
-		return true
+	return logic_experssion2_(tokList) && logic_experssion3(tokList)
+}
+
+func logic_experssion3_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	t := cmp_op(tokList) && term(tokList)
+	if t {
+		logic_experssion3_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return logic_experssion2(tokList) && cmp_op(tokList) && logic_experssion3(tokList)
+	return true
 }
 
 func logic_experssion3(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if math_experssion(tokList) {
-		return true
-	}
-	tokList = tmp.Copy()
-	if logic_experssion3(tokList) && bitwise_op(tokList) && term(tokList) {
-		return true
-	}
-	tokList = tmp.Copy()
-	return term(tokList)
+	return term(tokList) && logic_experssion3_(tokList)
 }
 
 func term(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	if tokList.IsIdentifier() {
 		return true
 	}
-	tokList = tmp.Copy()
+	*tokList = tmp.ShallowCopy()
 	if tokList.IsInt() {
 		return true
 	}
-	tokList = tmp.Copy()
+	*tokList = tmp.ShallowCopy()
 	if tokList.IsDouble() {
 		return true
 	}
-	tokList = tmp.Copy()
+	*tokList = tmp.ShallowCopy()
 	if tokList.IsString() {
 		return true
 	}
-	tokList = tmp.Copy()
-	return tokList.Match("(") && math_experssion(tokList) && tokList.Match(")")
+	*tokList = tmp.ShallowCopy()
+	if tokList.Match("(") && math_experssion(tokList) && tokList.Match(")") {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return false
 }
 
 func op1(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if tokList.Match("+") {
-		return true
+	tmp := tokList.ShallowCopy()
+	types := []string{"+", "-"}
+	for _, tp := range types {
+		if tokList.Match(tp) {
+			return true
+		}
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return tokList.Match("-")
+	return false
 }
 
 func op2(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if tokList.Match("*") {
-		return true
+	tmp := tokList.ShallowCopy()
+	types := []string{"*", "/"}
+	for _, tp := range types {
+		if tokList.Match(tp) {
+			return true
+		}
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return tokList.Match("/")
+	return false
 }
 
 func bool_op(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if tokList.Match("&&") {
-		return true
+	tmp := tokList.ShallowCopy()
+	types := []string{"||", "&&"}
+	for _, tp := range types {
+		if tokList.Match(tp) {
+			return true
+		}
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return tokList.Match("||")
+	return false
 }
 
 func cmp_op(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	types := []string{">", "<", ">=", "<=", "=="}
 	for _, tp := range types {
 		if tokList.Match(tp) {
 			return true
 		}
-		tokList = tmp.Copy()
+		*tokList = tmp.ShallowCopy()
 	}
 	return false
 }
 
 func bitwise_op(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	types := []string{"&", "|", "^", "~"}
 	for _, tp := range types {
 		if tokList.Match(tp) {
 			return true
 		}
-		tokList = tmp.Copy()
+		*tokList = tmp.ShallowCopy()
 	}
 	return false
 }

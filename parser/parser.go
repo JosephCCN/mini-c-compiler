@@ -6,52 +6,68 @@ import (
 
 // this is the only export function
 func Start(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	return ex_declaration(tokList) && start_(tokList)
+}
+
+func start_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
 	if ex_declaration(tokList) {
-		return true
+		start_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return Start(tokList) && ex_declaration(tokList)
+	return true
 }
 
 func ex_declaration(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	if function(tokList) {
 		return true
 	}
-	tokList = tmp.Copy()
-	return var_declaration(tokList)
+	*tokList = tmp.ShallowCopy()
+	if var_declaration(tokList) {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return false
 }
 
 func function(tokList *utils.TokenList) bool {
-	return (types(tokList) && tokList.IsIdentifier() && tokList.Match("(") && tokList.Match(")") && tokList.Match("{") &&
-		block_statement(tokList) && return_statement(tokList) && tokList.Match("}"))
+	t := types(tokList) && tokList.IsIdentifier() && tokList.Match("(") && tokList.Match(")") && tokList.Match("{") &&
+		block_statement(tokList) && return_statement(tokList) && tokList.Match("}")
+	return t
 }
 
 func types(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	types := []string{"int", "double", "char", "string"}
 	for _, tp := range types {
 		if tokList.Match(tp) {
 			return true
 		}
-		tokList = tmp.Copy()
+		*tokList = tmp.ShallowCopy()
 	}
 	return false
 }
 
-func block_statement(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+func block_statement_(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
 	if statement(tokList) {
-		return true
+		block_statement_(tokList)
+	} else {
+		*tokList = tmp.ShallowCopy()
 	}
-	tokList = tmp.Copy()
-	return block_statement(tokList) && statement(tokList)
+	return true
+}
+
+func block_statement(tokList *utils.TokenList) bool {
+	t := statement(tokList) && block_statement_(tokList)
+	return t
 }
 
 // LL(1) parsing
 func statement(tokList *utils.TokenList) bool {
-	return true
+	return var_declaration(tokList)
 }
 
 func return_statement(tokList *utils.TokenList) bool {
@@ -62,28 +78,12 @@ func var_declaration(tokList *utils.TokenList) bool {
 	return types(tokList) && assignment(tokList)
 }
 
-func type_ep(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
-	if tokList.IsInt() {
-		return true
-	}
-	if tokList.IsDouble() {
-		return true
-	}
-	tokList = tmp.Copy()
-	if tokList.IsChar() {
-		return true
-	}
-	tokList = tmp.Copy()
-	return tokList.IsString()
-}
-
 func assignment(tokList *utils.TokenList) bool {
-	tmp := tokList.Copy()
+	tmp := tokList.ShallowCopy()
 	if tokList.IsIdentifier() && tokList.Match("=") && tokList.IsIdentifier() {
 		return true
 	}
-	tokList = tmp.Copy()
+	*tokList = tmp.ShallowCopy()
 	return tokList.IsIdentifier() && tokList.Match("=") && expressions(tokList)
 }
 

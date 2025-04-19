@@ -6,6 +6,7 @@ import (
 	"os"
 
 	"github.com/lexical"
+	"github.com/parser"
 )
 
 func main() {
@@ -32,12 +33,12 @@ func main() {
 		fmt.Println(err)
 	}
 	fmt.Println(tokenList)
-	// for _, tok := range tokenList.GetList() {
-	// 	if tok.IsInt() {
-	// 		fmt.Println("yes")
-	// 	}
-	// }
+	for _, tok := range tokenList.GetList() {
+		if tok.IsInt() {
+			fmt.Println("yes")
+		}
+	}
 
-	// fmt.Println(parser.Start(&tokenList))
+	fmt.Println(parser.Start(&tokenList))
 
 }

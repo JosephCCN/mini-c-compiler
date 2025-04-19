@@ -21,6 +21,14 @@ func (self *TokenList) Copy() *TokenList {
 	return ret
 }
 
+func (self *TokenList) ShallowCopy() TokenList {
+	ret := TokenList{
+		list: self.list,
+		cur:  self.cur,
+	}
+	return ret
+}
+
 func (self *TokenList) Push(tok Token) {
 	self.list = append(self.list, tok)
 }
