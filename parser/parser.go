@@ -109,13 +109,60 @@ func statement(tokList *utils.TokenList) bool {
 	return false
 }
 
+// SR(0) parsing
 func return_statement(tokList *utils.TokenList) bool {
+	return return_statement_sr(tokList)
+}
+
+func return_statement_recursive(tokList *utils.TokenList) bool {
 	tmp := tokList.ShallowCopy()
 	if tokList.Match("return") && type_ep(tokList) && tokList.Match(";") {
 		return true
 	}
 	*tokList = tmp.ShallowCopy()
 	return tokList.Match("return") && tokList.IsIdentifier() && tokList.Match(";")
+}
+
+func return_statement_sr(tokList *utils.TokenList) bool {
+	stack := make([]utils.Token, 0)
+	state := 0
+	for 0 <= state && state <= 3 {
+		tok := tokList.Pop()
+		switch state {
+		case 0:
+			if tok.Match("return") {
+				stack = append(stack, tok)
+				state = 1
+			} else {
+				state = -1
+			}
+		case 1:
+			if tok.IsIdentifier() {
+				stack = append(stack, tok)
+				state = 2
+			} else if tok.Type_ep() {
+				stack = append(stack, tok)
+				state = 3
+			} else {
+				state = -1
+			}
+		case 2:
+			if tok.Match(";") {
+				stack = append(stack, tok)
+				state = 4
+			} else {
+				state = -1
+			}
+		case 3:
+			if tok.Match(";") {
+				stack = append(stack, tok)
+				state = 5
+			} else {
+				state = -1
+			}
+		}
+	}
+	return state == 4 || state == 5
 }
 
 func var_declaration(tokList *utils.TokenList) bool {

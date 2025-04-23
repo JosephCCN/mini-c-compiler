@@ -41,3 +41,13 @@ func (tok Token) IsChar() bool {
 func (tok Token) IsIdentifier() bool {
 	return tok.tokType == "identifier"
 }
+
+func (tok Token) Type_ep() bool {
+	types := []string{"integer", "double", "string", "character"}
+	for _, tp := range types {
+		if tok.tokType == tp {
+			return true
+		}
+	}
+	return false
+}

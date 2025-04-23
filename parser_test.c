@@ -1,9 +1,4 @@
 int tmp() {
     int b = 1;
-    return 1.2;
-}
-
-int test() {
-    int c = 1;
-    return a;
+    return ;
 }
