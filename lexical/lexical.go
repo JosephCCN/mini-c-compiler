@@ -31,10 +31,10 @@ func Run(src string) (utils.TokenList, error) {
 		"string":     regexp.MustCompile("^\".*\"?"),
 		"identifier": regexp.MustCompile("^[_a-zA-Z][_a-zA-Z0-9]*"),
 		"keyword":    regexp.MustCompile("^int|^char|^string|^main|^for|^while|^else if|^if|^else|^return|^include|^define"),
-		"operator":   regexp.MustCompile(`^=|^-|^\+|^\*|^/|^>=|^<=|^>|^<|^==`),
+		"operator":   regexp.MustCompile(`^=|^-|^\+|^\*|^/|^>=|^<=|^>|^<|^==|^&&|^\|\||^!`),
 		"punc":       regexp.MustCompile(`^{|^}|^;|^\(|^\)|^,|^\[|^\]`),
 	}
-	order := []string{"keyword", "identifier", "double", "integer", "string", "character", "operator", "punc"}
+	order := []string{"keyword", "identifier", "operator", "double", "integer", "string", "character", "punc"}
 
 	for len(src) > 0 {
 		src = strings.TrimSpace(src)

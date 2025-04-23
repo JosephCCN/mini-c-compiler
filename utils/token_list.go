@@ -13,6 +13,10 @@ func GetTokenList() TokenList {
 	return ret
 }
 
+func (self *TokenList) End() bool {
+	return len(self.list) == self.cur
+}
+
 func (self *TokenList) Copy() *TokenList {
 	ret := &TokenList{
 		list: self.list,
