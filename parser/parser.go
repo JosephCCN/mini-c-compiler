@@ -6,7 +6,8 @@ import (
 
 // this is the only export function
 func Start(tokList *utils.TokenList) bool {
-	return ex_declaration(tokList) && start_(tokList)
+	res := ex_declaration(tokList) && start_(tokList)
+	return res && tokList.End()
 }
 
 func start_(tokList *utils.TokenList) bool {
@@ -25,11 +26,7 @@ func ex_declaration(tokList *utils.TokenList) bool {
 		return true
 	}
 	*tokList = tmp.ShallowCopy()
-	if var_declaration(tokList) {
-		return true
-	}
-	*tokList = tmp.ShallowCopy()
-	return false
+	return var_declaration(tokList)
 }
 
 func function(tokList *utils.TokenList) bool {
@@ -83,13 +80,25 @@ func block_statement(tokList *utils.TokenList) bool {
 }
 
 // LL(1) parsing
-
 func statement(tokList *utils.TokenList) bool {
-	return statement_core(tokList) && tokList.Match(";")
-}
-
-func statement_core(tokList *utils.TokenList) bool {
-	return var_declaration(tokList)
+	tmp := tokList.ShallowCopy()
+	if var_declaration(tokList) && tokList.Match(";") {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	if assignment(tokList) && tokList.Match(";") {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	if if_statement(tokList) {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	if for_statement(tokList) {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return while_statement(tokList)
 }
 
 func return_statement(tokList *utils.TokenList) bool {
@@ -107,13 +116,9 @@ func var_declaration(tokList *utils.TokenList) bool {
 
 func assignment(tokList *utils.TokenList) bool {
 	tmp := tokList.ShallowCopy()
-	if tokList.IsIdentifier() && tokList.Match("=") && tokList.IsIdentifier() {
+	if tokList.IsIdentifier() && tokList.Match("=") && expressions(tokList) {
 		return true
 	}
 	*tokList = tmp.ShallowCopy()
-	return tokList.IsIdentifier() && tokList.Match("=") && expressions(tokList)
-}
-
-func if_statement(tokList *utils.TokenList) bool {
-	return true
+	return tokList.IsIdentifier() && tokList.Match("=") && tokList.IsIdentifier()
 }
