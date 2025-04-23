@@ -50,6 +50,23 @@ func types(tokList *utils.TokenList) bool {
 	return false
 }
 
+func type_ep(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	if tokList.IsInt() {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	if tokList.IsChar() {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	if tokList.IsString() {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return tokList.IsDouble()
+}
+
 func block_statement_(tokList *utils.TokenList) bool {
 	tmp := tokList.ShallowCopy()
 	if statement(tokList) {
@@ -66,12 +83,22 @@ func block_statement(tokList *utils.TokenList) bool {
 }
 
 // LL(1) parsing
+
 func statement(tokList *utils.TokenList) bool {
+	return statement_core(tokList) && tokList.Match(";")
+}
+
+func statement_core(tokList *utils.TokenList) bool {
 	return var_declaration(tokList)
 }
 
 func return_statement(tokList *utils.TokenList) bool {
-	return true
+	tmp := tokList.ShallowCopy()
+	if tokList.Match("return") && type_ep(tokList) && tokList.Match(";") {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return tokList.Match("return") && tokList.IsIdentifier() && tokList.Match(";")
 }
 
 func var_declaration(tokList *utils.TokenList) bool {
