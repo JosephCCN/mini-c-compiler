@@ -5,11 +5,12 @@ This is a mini C compiler that aims to compile simple C language into intermidat
 Notes that this compiler do not fully follow ISO C standard
 
 ## Usage
-The main entrance is `\main.go`, and you can run it by:
+The main entrance is `main.go`, and you can run it by:
 ```
-go run main.go -s {scource file path}
+go run main.go -s {source file path}
 ```
 To build the source code into binary:
 ```
-go build main.go -o {destination}
+go build main.go
+./main -s {source file path}
 ```

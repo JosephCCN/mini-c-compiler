@@ -33,11 +33,6 @@ func main() {
 		fmt.Println(err)
 	}
 	fmt.Println(tokenList)
-	for _, tok := range tokenList.GetList() {
-		if tok.IsInt() {
-			fmt.Println("yes")
-		}
-	}
 
 	fmt.Println(parser.Start(&tokenList))
 

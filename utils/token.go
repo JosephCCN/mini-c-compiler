@@ -4,13 +4,15 @@ type Token struct {
 	content string
 	id      int
 	tokType string
+	line    int
 }
 
-func GetToken(content string, tokType string) Token {
+func GetToken(content string, tokType string, line int) Token {
 	return Token{
 		content: content,
 		id:      -1,
 		tokType: tokType,
+		line:    line,
 	}
 }
 
