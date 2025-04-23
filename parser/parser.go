@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/utils"
 )
 
@@ -21,12 +23,13 @@ func start_(tokList *utils.TokenList) bool {
 }
 
 func ex_declaration(tokList *utils.TokenList) bool {
+	fmt.Println(tokList)
 	tmp := tokList.ShallowCopy()
 	if function(tokList) {
 		return true
 	}
 	*tokList = tmp.ShallowCopy()
-	return var_declaration(tokList)
+	return var_declaration(tokList) && tokList.Match(";")
 }
 
 func function(tokList *utils.TokenList) bool {
