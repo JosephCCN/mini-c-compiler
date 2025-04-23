@@ -13,6 +13,7 @@ func expressions(tokList *utils.TokenList) bool {
 	if logic_experssion(tokList) {
 		return true
 	}
+	*tokList = tmp.ShallowCopy()
 	return term(tokList)
 }
 
@@ -78,7 +79,7 @@ func logic_experssion2_(tokList *utils.TokenList) bool {
 }
 
 func logic_experssion2(tokList *utils.TokenList) bool {
-	return logic_experssion2_(tokList) && logic_experssion3(tokList)
+	return logic_experssion3(tokList) && logic_experssion2_(tokList)
 }
 
 func logic_experssion3_(tokList *utils.TokenList) bool {

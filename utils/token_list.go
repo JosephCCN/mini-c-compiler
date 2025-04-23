@@ -1,5 +1,7 @@
 package utils
 
+var TokenListDeepest int
+
 type TokenList struct {
 	list []Token
 	cur  int
@@ -42,11 +44,20 @@ func (self *TokenList) Pop() Token {
 		return Token{}
 	}
 	self.cur += 1
+	TokenListDeepest = max(self.cur, TokenListDeepest)
 	return self.list[self.cur-1]
+}
+
+func (self *TokenList) GetToken(pos int) Token {
+	return self.list[pos]
 }
 
 func (self *TokenList) GetList() []Token {
 	return self.list
+}
+
+func (self *TokenList) GetCursor() int {
+	return self.cur
 }
 
 func (self *TokenList) Match(content string) bool {

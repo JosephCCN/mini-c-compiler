@@ -16,8 +16,12 @@ func GetToken(content string, tokType string, line int) Token {
 	}
 }
 
-func (tok Token) GetContent() string {
+func (tok Token) Getcontent() string {
 	return tok.content
+}
+
+func (tok Token) GetLine() int {
+	return tok.line
 }
 
 func (tok Token) Match(content string) bool {

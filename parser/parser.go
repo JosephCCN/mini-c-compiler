@@ -75,8 +75,7 @@ func block_statement_(tokList *utils.TokenList) bool {
 }
 
 func block_statement(tokList *utils.TokenList) bool {
-	t := statement(tokList) && block_statement_(tokList)
-	return t
+	return statement(tokList) && block_statement_(tokList)
 }
 
 // LL(1) parsing
