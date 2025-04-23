@@ -1,12 +1,12 @@
-module github.com/main
+module main
 
 go 1.23.1
 
-replace github.com/lexical => ../lexical
+replace github.com/lexical => ./lexical
 
-replace github.com/parser => ../parser
+replace github.com/parser => ./parser
 
-replace github.com/utils => ../utils
+replace github.com/utils => ./utils
 
 require (
 	github.com/lexical v0.0.0
