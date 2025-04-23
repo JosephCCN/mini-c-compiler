@@ -1,8 +1,6 @@
 package parser
 
 import (
-	"fmt"
-
 	"github.com/utils"
 )
 
@@ -23,7 +21,6 @@ func start_(tokList *utils.TokenList) bool {
 }
 
 func ex_declaration(tokList *utils.TokenList) bool {
-	fmt.Println(tokList)
 	tmp := tokList.ShallowCopy()
 	if function(tokList) {
 		return true
@@ -85,23 +82,31 @@ func block_statement(tokList *utils.TokenList) bool {
 // LL(1) parsing
 func statement(tokList *utils.TokenList) bool {
 	tmp := tokList.ShallowCopy()
-	if var_declaration(tokList) && tokList.Match(";") {
-		return true
+	if types(tokList) {
+		*tokList = tmp.ShallowCopy()
+		return var_declaration(tokList) && tokList.Match(";")
 	}
 	*tokList = tmp.ShallowCopy()
-	if assignment(tokList) && tokList.Match(";") {
-		return true
+	if tokList.IsIdentifier() {
+		*tokList = tmp.ShallowCopy()
+		return assignment(tokList) && tokList.Match(";")
 	}
 	*tokList = tmp.ShallowCopy()
-	if if_statement(tokList) {
-		return true
+	if tokList.Match("if") {
+		*tokList = tmp.ShallowCopy()
+		return if_statement(tokList)
 	}
 	*tokList = tmp.ShallowCopy()
-	if for_statement(tokList) {
-		return true
+	if tokList.Match("for") {
+		*tokList = tmp.ShallowCopy()
+		return for_statement(tokList)
 	}
 	*tokList = tmp.ShallowCopy()
-	return while_statement(tokList)
+	if tokList.Match("while") {
+		*tokList = tmp.ShallowCopy()
+		return while_statement(tokList)
+	}
+	return false
 }
 
 func return_statement(tokList *utils.TokenList) bool {
