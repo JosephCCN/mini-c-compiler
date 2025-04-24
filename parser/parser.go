@@ -29,9 +29,27 @@ func ex_declaration(tokList *utils.TokenList) bool {
 	return var_declaration(tokList) && tokList.Match(";")
 }
 
+func parameter(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	if types(tokList) && tokList.IsIdentifier() && parameter2(tokList) {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return true
+}
+
+func parameter2(tokList *utils.TokenList) bool {
+	tmp := tokList.ShallowCopy()
+	if tokList.Match(",") && types(tokList) && tokList.IsIdentifier() && parameter2(tokList) {
+		return true
+	}
+	*tokList = tmp.ShallowCopy()
+	return true
+}
+
 func function(tokList *utils.TokenList) bool {
-	t := types(tokList) && tokList.IsIdentifier() && tokList.Match("(") && tokList.Match(")") && tokList.Match("{") &&
-		block_statement(tokList) && return_statement(tokList) && tokList.Match("}")
+	t := types(tokList) && tokList.IsIdentifier() && tokList.Match("(") && parameter(tokList) && tokList.Match(")") &&
+		tokList.Match("{") && block_statement(tokList) && return_statement(tokList) && tokList.Match("}")
 	return t
 }
 
