@@ -8,22 +8,22 @@ func if_statement(tokList *utils.TokenList) bool {
 }
 
 func else_if_statement(tokList *utils.TokenList) bool {
-	tmp := tokList.ShallowCopy()
+	tmp := *tokList
 	t := tokList.Match("else if") && tokList.Match("(") && logic_experssion(tokList) && tokList.Match(")") &&
 		tokList.Match("{") && block_statement(tokList) && tokList.Match("}") && else_if_statement(tokList)
 	if t {
 		return true
 	}
-	*tokList = tmp.ShallowCopy()
+	*tokList = tmp
 	return else_statement(tokList)
 }
 
 func else_statement(tokList *utils.TokenList) bool {
-	tmp := tokList.ShallowCopy()
+	tmp := *tokList
 	if tokList.Match("else") && tokList.Match("{") && block_statement(tokList) && tokList.Match("}") {
 		return true
 	} else {
-		*tokList = tmp.ShallowCopy()
+		*tokList = tmp
 	}
 	return true
 }
@@ -34,33 +34,33 @@ func while_statement(tokList *utils.TokenList) bool {
 }
 
 func for_init(tokList *utils.TokenList) bool {
-	tmp := tokList.ShallowCopy()
+	tmp := *tokList
 	if var_declaration(tokList) {
 		return true
 	}
-	*tokList = tmp.ShallowCopy()
+	*tokList = tmp
 	if assignment(tokList) {
 		return true
 	}
-	*tokList = tmp.ShallowCopy()
+	*tokList = tmp
 	return true
 }
 
 func for_condition(tokList *utils.TokenList) bool {
-	tmp := tokList.ShallowCopy()
+	tmp := *tokList
 	if logic_experssion(tokList) {
 		return true
 	}
-	*tokList = tmp.ShallowCopy()
+	*tokList = tmp
 	return true
 }
 
 func for_incr(tokList *utils.TokenList) bool {
-	tmp := tokList.ShallowCopy()
+	tmp := *tokList
 	if assignment(tokList) {
 		return true
 	}
-	*tokList = tmp.ShallowCopy()
+	*tokList = tmp
 	return true
 }
 
