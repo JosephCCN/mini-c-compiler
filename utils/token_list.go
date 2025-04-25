@@ -15,6 +15,13 @@ func GetTokenList() TokenList {
 	return ret
 }
 
+func (self *TokenList) PrevToken() Token {
+	if self.cur == 0 {
+		return Token{}
+	}
+	return self.list[self.cur-1]
+}
+
 func (self *TokenList) End() bool {
 	return len(self.list) == self.cur
 }

@@ -8,6 +8,7 @@ import (
 
 	"github.com/lexical"
 	"github.com/parser"
+	"github.com/semantic"
 	"github.com/utils"
 )
 
@@ -19,9 +20,9 @@ func redString(src string) string {
 
 func main() {
 
-	var (
-		srcPath string
-	)
+	semantic.Init()
+
+	var srcPath string
 	flag.StringVar(&srcPath, "s", "", "source file path")
 	flag.Parse()
 
