@@ -7,10 +7,10 @@ Notes that this compiler do not fully follow ISO C standard
 ## Usage
 The main entrance is `main.go`, and you can run it by:
 ```
-go run main.go -s {source file path}
+go run main.go -s {source file path} -o {destination directory}
 ```
 To build the source code into binary:
 ```
 go build main.go
-./main -s {source file path}
+./main -s {source file path} -o {destination directory}
 ```
