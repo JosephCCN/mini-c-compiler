@@ -53,7 +53,7 @@ func else_if_statement(tokList *utils.TokenList, lastLabel int) bool {
 	tmpS := *semantic.Sstack
 	initScope := semantic.Scope
 	table := semantic.GetSymbolTable()
-	table.SetParent(semantic.CurrentSymbolTable)
+	table.SetParent(semantic.CurrentSymbolTable.Parent())
 	node := semantic.GetSymbolTableNode(utils.RandString(8), "else if", &table, semantic.Scope, -1)
 	semantic.CurrentSymbolTable.Insert(&node)
 	semantic.CurrentSymbolTable = &table
@@ -89,7 +89,7 @@ func else_statement(tokList *utils.TokenList) bool {
 	tmpQ := *semantic.Qstack
 	initScope := semantic.Scope
 	table := semantic.GetSymbolTable()
-	table.SetParent(semantic.CurrentSymbolTable)
+	table.SetParent(semantic.CurrentSymbolTable.Parent())
 	node := semantic.GetSymbolTableNode(utils.RandString(8), "else", &table, semantic.Scope, -1)
 	semantic.CurrentSymbolTable.Insert(&node)
 	semantic.CurrentSymbolTable = &table
