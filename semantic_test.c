@@ -1,5 +1,7 @@
-int tmp() {
-    int b = 1;
-    int c = b * 'a';
-    return b;
+int tmp(int a) {
+    double c;
+    for(int i=0;i<10;i = i + 1) {
+        int b = a + 1;
+    }
+    return c;
 }

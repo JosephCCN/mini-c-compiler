@@ -32,13 +32,24 @@ func Action() bool {
 	return false
 }
 
-func getType(v utils.Token) string {
+func getType(v utils.Token, recursive bool) string {
 	if v.Type() == "identifier" {
-		node := RootSymbolTable.Find(v.Content(), Scope)
-		if node == nil {
+		node := CurrentSymbolTable.Find(v.Content())
+		if node != nil {
+			return node.Type
+		}
+		if recursive {
+			if CurrentSymbolTable.Parent() == CurrentSymbolTable {
+				return ""
+			}
+			tmp := CurrentSymbolTable
+			CurrentSymbolTable = CurrentSymbolTable.Parent()
+			res := getType(v, recursive)
+			CurrentSymbolTable = tmp
+			return res
+		} else {
 			return ""
 		}
-		return node.Type
 	} else if v.Type() == "keyword" {
 		return KeywordShortTermToFullTerm[v.Content()]
 	}
@@ -50,7 +61,7 @@ func typeConversion(t1 string, t2 string, op string) (string, error) {
 	if res != "" {
 		return res, nil
 	}
-	return "", fmt.Errorf("cannot Convert %s and %s", t1, t2)
+	return "", fmt.Errorf("Operator %s cannot apply on %s and %s", op, t1, t2)
 }
 
 func if_statement(v utils.Token) bool {
@@ -62,8 +73,17 @@ func if_statement(v utils.Token) bool {
 }
 
 func operator(v1 utils.Token, v2 utils.Token, op string) bool {
-	v1Type := getType(v1)
-	v2Type := getType(v2)
+	v1Type := getType(v1, true)
+	v2Type := getType(v2, true)
+
+	if v1Type == "" {
+		fmt.Println(utils.RedString(fmt.Sprintf("%s is used before declaration", v1.Content())))
+		return false
+	}
+	if v2Type == "" {
+		fmt.Println(utils.RedString(fmt.Sprintf("%s is used before declaration", v2.Content())))
+		return false
+	}
 
 	convertedType, err := typeConversion(v1Type, v2Type, op)
 	if err != nil {
@@ -80,19 +100,19 @@ func operator(v1 utils.Token, v2 utils.Token, op string) bool {
 }
 
 func declaration(v utils.Token, tp utils.Token) bool {
-	tpType := getType(tp)
+	tpType := getType(tp, false)
 	_, err := typeConversion(tpType, v.Type(), "+")
 	if err != nil {
 		fmt.Println(utils.RedString("Wrong type assignment"))
 		return false
 	}
 	node := GetSymbolTableNode(v.Content(), tpType, nil, Scope, TypeSize[tpType])
-	return RootSymbolTable.Insert(&node)
+	return CurrentSymbolTable.Insert(&node)
 }
 
 func assignemnt(l utils.Token, r utils.Token) bool {
-	lType := getType(l)
-	rType := getType(r)
+	lType := getType(l, false)
+	rType := getType(r, false)
 	if lType == "" { // lvalue is not declared, assume this assignment is declaration
 		Sstack.Push(utils.GetToken(l.Content(), rType, l.Line())) //replace the type of lvalue from identifier to type of right value
 		q := GetQuadruple("=", l.Content(), "", r.Content())

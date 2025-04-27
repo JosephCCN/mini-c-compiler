@@ -1,29 +1,18 @@
 package semantic
 
-type FunctionTableNode struct {
-	returnType    string
-	paraNum       int
-	paraTable     *SymbolTable
-	localVarTable *SymbolTable
-}
-
 type FunctionTable struct {
-	table []*FunctionTableNode
+	returnType string
+	paraNum    int
+	parameter  *SymbolTable
+	variable   *SymbolTable
 }
 
-func GetFunctionTable() FunctionTable {
+func GetFunctionTable(returnType string, paraNum int, parameter *SymbolTable, variable *SymbolTable) FunctionTable {
 	ret := FunctionTable{
-		table: make([]*FunctionTableNode, 0),
-	}
-	return ret
-}
-
-func GetFunctionTableNode(returnType string, paraNum int, paraTable *SymbolTable, localVarTable *SymbolTable) FunctionTableNode {
-	ret := FunctionTableNode{
-		returnType:    returnType,
-		paraNum:       paraNum,
-		paraTable:     paraTable,
-		localVarTable: localVarTable,
+		returnType: returnType,
+		paraNum:    paraNum,
+		parameter:  parameter,
+		variable:   variable,
 	}
 	return ret
 }

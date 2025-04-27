@@ -1,6 +1,7 @@
 package semantic
 
 var RootSymbolTable *SymbolTable
+var CurrentSymbolTable *SymbolTable
 var Sstack *SemanticStack
 var Qstack *quadrupleStack
 var Scope int
@@ -9,10 +10,13 @@ var NextLable int
 var TypeSize map[string]int
 var TypeConvert map[string]map[string]map[string]string
 var KeywordShortTermToFullTerm map[string]string
+var FunctionReturnType map[string]string
 
 func Init() {
 	tmpST := GetSymbolTable()
 	RootSymbolTable = &tmpST
+	RootSymbolTable.SetParent(RootSymbolTable)
+	CurrentSymbolTable = RootSymbolTable
 	tmpSS := GetSemanticStack()
 	Sstack = &tmpSS
 	tmpQs := GetQuadrupleStack()
@@ -29,6 +33,7 @@ func Init() {
 		"char":   "character",
 		"string": "string",
 	}
+	FunctionReturnType = make(map[string]string)
 	conversionInit()
 	Scope = 0
 	nextT = 0
@@ -79,4 +84,14 @@ func conversionInit() {
 		"^":  plus,
 		"~":  plus,
 	}
+}
+
+func IncreaseScope() bool {
+	Scope += 1
+	return true
+}
+
+func DecreaseScope() bool {
+	Scope -= 1
+	return true
 }

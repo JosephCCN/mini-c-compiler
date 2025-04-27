@@ -1,6 +1,8 @@
 package parser
 
 import (
+	"fmt"
+
 	"github.com/semantic"
 	"github.com/utils"
 )
@@ -33,7 +35,11 @@ func ex_declaration(tokList *utils.TokenList) bool {
 
 func parameter(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	if types(tokList) && tokList.IsIdentifier() && parameter2(tokList) {
+	var typeTok utils.Token
+	var id utils.Token
+	if types(tokList) && tokList.Mark(&typeTok, tokList.Cursor()-1) && tokList.IsIdentifier() && tokList.Mark(&id, tokList.Cursor()-1) && parameter2(tokList) {
+		nd := semantic.GetSymbolTableNode(id.Content(), semantic.KeywordShortTermToFullTerm[typeTok.Content()], nil, semantic.Scope, 0)
+		semantic.CurrentSymbolTable.Insert(&nd)
 		return true
 	}
 	*tokList = tmp
@@ -42,7 +48,11 @@ func parameter(tokList *utils.TokenList) bool {
 
 func parameter2(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	if tokList.Match(",") && types(tokList) && tokList.IsIdentifier() && parameter2(tokList) {
+	var typeTok utils.Token
+	var id utils.Token
+	if tokList.Match(",") && types(tokList) && tokList.Mark(&typeTok, tokList.Cursor()-1) && tokList.IsIdentifier() && tokList.Mark(&id, tokList.Cursor()-1) && parameter2(tokList) {
+		nd := semantic.GetSymbolTableNode(id.Content(), semantic.KeywordShortTermToFullTerm[typeTok.Content()], nil, semantic.Scope, 0)
+		semantic.CurrentSymbolTable.Insert(&nd)
 		return true
 	}
 	*tokList = tmp
@@ -50,9 +60,30 @@ func parameter2(tokList *utils.TokenList) bool {
 }
 
 func function(tokList *utils.TokenList) bool {
-	t := types(tokList) && tokList.IsIdentifier() && tokList.Match("(") && parameter(tokList) && tokList.Match(")") &&
-		tokList.Match("{") && block_statement(tokList) && return_statement(tokList) && tokList.Match("}")
-	return t
+	initScope := semantic.Scope
+	var typeTok utils.Token
+	var id utils.Token
+	t1 := types(tokList) && tokList.Mark(&typeTok, tokList.Cursor()-1) && tokList.IsIdentifier() && tokList.Mark(&id, tokList.Cursor()-1) && tokList.Match("(")
+	if t1 {
+		semantic.IncreaseScope()
+		functionID := utils.RandString(8)                                                                // now the function is represented with an ID
+		semantic.FunctionReturnType[functionID] = semantic.KeywordShortTermToFullTerm[typeTok.Content()] // save the return type
+		functionSymbolTable := semantic.GetSymbolTable()
+		functionSymbolTable.SetParent(semantic.CurrentSymbolTable)
+		functionNode := semantic.GetSymbolTableNode(functionID, "funct", &functionSymbolTable, semantic.Scope, -1)
+		semantic.CurrentSymbolTable.Insert(&functionNode)
+		semantic.CurrentSymbolTable = &functionSymbolTable // pass current symbol table to new function symbol table
+		t2 := parameter(tokList)
+		if t2 {
+			t3 := tokList.Match(")") && tokList.Match("{") && block_statement(tokList) && return_statement(tokList, functionID) && tokList.Match("}") && semantic.DecreaseScope()
+			if t3 {
+				semantic.CurrentSymbolTable = semantic.CurrentSymbolTable.Parent() // return the symbol table to parent symbol table
+				return true
+			}
+		}
+	}
+	semantic.Scope = initScope
+	return false
 }
 
 func types(tokList *utils.TokenList) bool {
@@ -129,8 +160,8 @@ func statement(tokList *utils.TokenList) bool {
 }
 
 // SR(0) parsing
-func return_statement(tokList *utils.TokenList) bool {
-	return return_statement_sr(tokList)
+func return_statement(tokList *utils.TokenList, functionID string) bool {
+	return return_statement_sr(tokList, functionID)
 }
 
 func return_statement_recursive(tokList *utils.TokenList) bool {
@@ -142,7 +173,7 @@ func return_statement_recursive(tokList *utils.TokenList) bool {
 	return tokList.Match("return") && tokList.IsIdentifier() && tokList.Match(";")
 }
 
-func return_statement_sr(tokList *utils.TokenList) bool {
+func return_statement_sr(tokList *utils.TokenList, functionID string) bool {
 	stack := make([]utils.Token, 0)
 	state := 0
 	for 0 <= state && state <= 3 {
@@ -157,6 +188,16 @@ func return_statement_sr(tokList *utils.TokenList) bool {
 			}
 		case 1:
 			if tok.IsIdentifier() {
+				prevTok := tokList.PrevToken()
+				retTok := semantic.CurrentSymbolTable.Find(prevTok.Content())
+				if retTok == nil {
+					fmt.Printf(utils.RedString("%s is not declared before using it\n"), prevTok.Content())
+					return false
+				}
+				if retTok.Type != semantic.FunctionReturnType[functionID] {
+					fmt.Printf(utils.RedString("Return type is not correct\n"))
+					return false
+				}
 				stack = append(stack, tok)
 				state = 2
 			} else if tok.Type_ep() {
@@ -186,10 +227,18 @@ func return_statement_sr(tokList *utils.TokenList) bool {
 
 func var_declaration(tokList *utils.TokenList) bool {
 	var tp utils.Token
+	tmp := *tokList
 	if types(tokList) && tokList.Mark(&tp, tokList.Cursor()-1) && assignment(tokList) {
 		semantic.Sstack.Push(tp)
 		semantic.Sstack.Push(utils.GetToken("d+", "declaration", -1))
 		semantic.Action()
+		return true
+	}
+	*tokList = tmp
+	if types(tokList) && tokList.Mark(&tp, tokList.Cursor()-1) && tokList.IsIdentifier() {
+		id := tokList.PrevToken()
+		nd := semantic.GetSymbolTableNode(id.Content(), semantic.KeywordShortTermToFullTerm[tp.Content()], nil, semantic.Scope, -1)
+		semantic.CurrentSymbolTable.Insert(&nd)
 		return true
 	}
 	return false

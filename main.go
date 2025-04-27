@@ -3,8 +3,10 @@ package main
 import (
 	"flag"
 	"fmt"
+	"math/rand"
 	"os"
 	"strings"
+	"time"
 
 	"github.com/lexical"
 	"github.com/parser"
@@ -15,6 +17,7 @@ import (
 func main() {
 
 	semantic.Init()
+	rand.Seed(time.Now().UnixNano())
 
 	var srcPath string
 	flag.StringVar(&srcPath, "s", "", "source file path")
@@ -49,12 +52,12 @@ func main() {
 		errTokenId := utils.TokenListDeepest - 1
 		errTok := tokenList.GetToken(errTokenId)
 		errLine := errTok.Line()
-		fmt.Println(utils.RedString((fmt.Sprintf("Syntax error in line %d:", errLine))))
+		fmt.Println(utils.RedString((fmt.Sprintf("Error in line %d:", errLine))))
 		fmt.Println(lines[errLine-1])
 
 	}
 	fmt.Println("Sstack:", semantic.Sstack)
 	fmt.Println("QStack:\n", semantic.Qstack.ListAll())
-	fmt.Println("Symbol Table:", semantic.RootSymbolTable.ListAll())
+	fmt.Println("Symbol Table:\n", semantic.RootSymbolTable.ListAll())
 
 }
