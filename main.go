@@ -54,7 +54,7 @@ func main() {
 
 	}
 	fmt.Println("Sstack:", semantic.Sstack)
-	fmt.Println("QStack:", semantic.Qstack)
+	fmt.Println("QStack:\n", semantic.Qstack.ListAll())
 	fmt.Println("Symbol Table:", semantic.RootSymbolTable.ListAll())
 
 }

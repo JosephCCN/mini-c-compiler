@@ -5,6 +5,7 @@ var Sstack *SemanticStack
 var Qstack *quadrupleStack
 var Scope int
 var nextT int
+var NextLable int
 var TypeSize map[string]int
 var TypeConvert map[string]map[string]map[string]string
 var KeywordShortTermToFullTerm map[string]string
@@ -30,6 +31,8 @@ func Init() {
 	}
 	conversionInit()
 	Scope = 0
+	nextT = 0
+	NextLable = 0
 }
 
 func conversionInit() {

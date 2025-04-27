@@ -1,5 +1,7 @@
 package semantic
 
+import "fmt"
+
 type quadruple struct {
 	op   string
 	var1 string
@@ -32,10 +34,12 @@ func (s *quadrupleStack) Push(q quadruple) {
 	s.stack = append(s.stack, q)
 }
 
-func (s *quadrupleStack) Pop() {
+func (s *quadrupleStack) Pop() quadruple {
+	q := s.Top()
 	if len(s.stack) >= 1 {
 		s.stack = s.stack[:len(s.stack)-1]
 	}
+	return q
 }
 
 func (s *quadrupleStack) Top() quadruple {
@@ -43,4 +47,12 @@ func (s *quadrupleStack) Top() quadruple {
 		return s.stack[len(s.stack)-1]
 	}
 	return quadruple{}
+}
+
+func (s *quadrupleStack) ListAll() string {
+	ret := ""
+	for _, q := range s.stack {
+		ret += fmt.Sprintf("(%s, %s, %s, %s)\n", q.op, q.var1, q.var2, q.res)
+	}
+	return ret
 }

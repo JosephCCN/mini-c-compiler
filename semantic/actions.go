@@ -22,6 +22,9 @@ func Action() bool {
 		tp := Sstack.Pop()
 		v := Sstack.Pop()
 		return declaration(v, tp)
+	case "if":
+		v := Sstack.Pop()
+		return if_statement(v)
 	default:
 		break
 	}
@@ -43,11 +46,19 @@ func getType(v utils.Token) string {
 }
 
 func typeConversion(t1 string, t2 string, op string) (string, error) {
-	res := TypeConvert[op][t1][t1]
+	res := TypeConvert[op][t1][t2]
 	if res != "" {
 		return res, nil
 	}
 	return "", fmt.Errorf("cannot Convert %s and %s", t1, t2)
+}
+
+func if_statement(v utils.Token) bool {
+	Qstack.Push(GetQuadruple("if", v.Content(), "", fmt.Sprintf("L%d", NextLable)))
+	Qstack.Push(GetQuadruple("goto", "", "", fmt.Sprintf("L%d", NextLable+1)))
+	Qstack.Push(GetQuadruple("label", "", "", fmt.Sprintf("L%d", NextLable)))
+	NextLable += 2
+	return true
 }
 
 func operator(v1 utils.Token, v2 utils.Token, op string) bool {
@@ -82,7 +93,6 @@ func declaration(v utils.Token, tp utils.Token) bool {
 func assignemnt(l utils.Token, r utils.Token) bool {
 	lType := getType(l)
 	rType := getType(r)
-	fmt.Println(l, r)
 	if lType == "" { // lvalue is not declared, assume this assignment is declaration
 		Sstack.Push(utils.GetToken(l.Content(), rType, l.Line())) //replace the type of lvalue from identifier to type of right value
 		q := GetQuadruple("=", l.Content(), "", r.Content())

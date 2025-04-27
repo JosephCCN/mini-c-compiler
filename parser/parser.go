@@ -7,9 +7,9 @@ import (
 
 // this is the only export function
 func Start(tokList *utils.TokenList) bool {
-	// res := ex_declaration(tokList) && start_(tokList)
-	// return res && tokList.End()
-	return var_declaration(tokList)
+	res := ex_declaration(tokList) && start_(tokList)
+	return res && tokList.End()
+	// return for_statement(tokList)
 }
 
 func start_(tokList *utils.TokenList) bool {

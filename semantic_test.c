@@ -1,1 +1,5 @@
-int b = (1 + 2) * 2;
+int tmp() {
+    int b = 1;
+    int c = b * 'a';
+    return b;
+}
