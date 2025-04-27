@@ -30,7 +30,7 @@ func Run(src string) (utils.TokenList, error) {
 		"character":  regexp.MustCompile("^'.'"),
 		"string":     regexp.MustCompile("^\".*\"?"),
 		"identifier": regexp.MustCompile("^[_a-zA-Z][_a-zA-Z0-9]*"),
-		"keyword":    regexp.MustCompile("^int|^char|^string|^main|^for|^while|^else if|^if|^else|^return|^include|^define"),
+		"keyword":    regexp.MustCompile("^int|^char|^string|^double|^main|^for|^while|^else if|^if|^else|^return|^include|^define"),
 		"operator":   regexp.MustCompile(`^=|^-|^\+|^\*|^/|^>=|^<=|^>|^<|^==|^&&|^\|\||^!`),
 		"punc":       regexp.MustCompile(`^{|^}|^;|^\(|^\)|^,|^\[|^\]`),
 		"newline":    regexp.MustCompile(`\n`),

@@ -10,6 +10,7 @@ func expressions(tokList *utils.TokenList) bool {
 	if logic_experssion(tokList) {
 		return true
 	}
+
 	*tokList = tmp
 	return term(tokList)
 }

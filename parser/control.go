@@ -40,10 +40,15 @@ func if_statement(tokList *utils.TokenList) bool {
 }
 
 func else_if_statement(tokList *utils.TokenList, lastLabel int) bool {
-	if !tokList.Match("else if") {
-		return false
-	}
 	tmp := *tokList
+	if !tokList.Match("else if") {
+		*tokList = tmp
+		if !tokList.Match("else") {
+			return false
+		}
+		*tokList = tmp
+		return else_statement(tokList)
+	}
 	tmpQ := *semantic.Qstack
 	tmpS := *semantic.Sstack
 	initScope := semantic.Scope
@@ -55,7 +60,7 @@ func else_if_statement(tokList *utils.TokenList, lastLabel int) bool {
 	defer func() {
 		semantic.CurrentSymbolTable = semantic.CurrentSymbolTable.Parent()
 	}()
-	t1 := tokList.Match("else if") && tokList.Match("(") && logic_experssion(tokList) && tokList.Match(")")
+	t1 := tokList.Match("(") && logic_experssion(tokList) && tokList.Match(")")
 	if t1 {
 		semantic.Sstack.Push(utils.GetToken("if", "keyword", -1))
 		semantic.Action()
@@ -76,6 +81,7 @@ func else_if_statement(tokList *utils.TokenList, lastLabel int) bool {
 
 func else_statement(tokList *utils.TokenList) bool {
 	if !tokList.Match("else") {
+		fmt.Println("else")
 		return false
 	}
 	tmp := *tokList
@@ -91,7 +97,7 @@ func else_statement(tokList *utils.TokenList) bool {
 		semantic.CurrentSymbolTable = semantic.CurrentSymbolTable.Parent()
 	}()
 
-	if tokList.Match("else") && tokList.Match("{") && semantic.IncreaseScope() && block_statement(tokList) && tokList.Match("}") && semantic.DecreaseScope() {
+	if tokList.Match("{") && semantic.IncreaseScope() && block_statement(tokList) && tokList.Match("}") && semantic.DecreaseScope() {
 		return true
 	} else {
 		*semantic.Qstack = tmpQ

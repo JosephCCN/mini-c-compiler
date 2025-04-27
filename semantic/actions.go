@@ -103,7 +103,7 @@ func declaration(v utils.Token, tp utils.Token) bool {
 	tpType := getType(tp, false)
 	_, err := typeConversion(tpType, v.Type(), "+")
 	if err != nil {
-		fmt.Println(utils.RedString("Wrong type assignment"))
+		fmt.Println(utils.RedString("Wrong type declaration"))
 		return false
 	}
 	node := GetSymbolTableNode(v.Content(), tpType, nil, Scope, TypeSize[tpType])

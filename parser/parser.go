@@ -201,6 +201,11 @@ func return_statement_sr(tokList *utils.TokenList, functionID string) bool {
 				stack = append(stack, tok)
 				state = 2
 			} else if tok.Type_ep() {
+				retTok := tokList.PrevToken()
+				if retTok.Type() != semantic.FunctionReturnType[functionID] {
+					fmt.Printf(utils.RedString("Return type is not correct\n"))
+					return false
+				}
 				stack = append(stack, tok)
 				state = 3
 			} else {

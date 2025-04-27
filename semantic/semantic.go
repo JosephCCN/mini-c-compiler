@@ -43,17 +43,17 @@ func Init() {
 func conversionInit() {
 	plus := map[string]map[string]string{
 		"integer": map[string]string{
-			"integer": "integer",
-			"double":  "double",
-			"char":    "integer",
+			"integer":   "integer",
+			"double":    "double",
+			"character": "integer",
 		},
 		"double": map[string]string{
 			"integer": "double",
 			"double":  "double",
 		},
-		"char": map[string]string{
-			"integer": "integer",
-			"char":    "char",
+		"character": map[string]string{
+			"integer":   "integer",
+			"character": "character",
 		},
 	}
 	multiply := map[string]map[string]string{
