@@ -20,10 +20,17 @@ func expressions(tokList *utils.TokenList) bool {
 
 func math_experssion_(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	t := op1(tokList) && math_experssion2(tokList)
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var op utils.Token
+	t := op1(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && math_experssion2(tokList)
 	if t {
+		semantic.Sstack.Push(op)
+		semantic.Action()
 		math_experssion_(tokList)
 	} else {
+		*semantic.Qstack = tmpQ
+		*semantic.Sstack = tmpS
 		*tokList = tmp
 	}
 	return true
@@ -35,10 +42,17 @@ func math_experssion(tokList *utils.TokenList) bool {
 
 func math_experssion2_(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	t := op2(tokList) && term(tokList)
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var op utils.Token
+	t := op2(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && term(tokList)
 	if t {
+		semantic.Sstack.Push(op)
+		semantic.Action()
 		math_experssion2_(tokList)
 	} else {
+		*semantic.Qstack = tmpQ
+		*semantic.Sstack = tmpS
 		*tokList = tmp
 	}
 	return true
@@ -116,6 +130,11 @@ func term(tokList *utils.TokenList) bool {
 	}
 	*tokList = tmp
 	if tokList.IsString() {
+		semantic.Sstack.Push(tokList.PrevToken())
+		return true
+	}
+	*tokList = tmp
+	if tokList.IsChar() {
 		semantic.Sstack.Push(tokList.PrevToken())
 		return true
 	}

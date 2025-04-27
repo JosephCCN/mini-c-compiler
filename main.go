@@ -12,12 +12,6 @@ import (
 	"github.com/utils"
 )
 
-func redString(src string) string {
-	var Red = "\033[31m"
-	var Reset = "\033[0m"
-	return Red + src + Reset
-}
-
 func main() {
 
 	semantic.Init()
@@ -41,10 +35,10 @@ func main() {
 	lines := strings.Split(string(src), "\n")
 	fmt.Println(tokenList)
 	if err != nil {
-		lst := tokenList.GetList()
+		lst := tokenList.List()
 		errTok := lst[len(lst)-1]
-		errLine := errTok.GetLine()
-		fmt.Println(redString(fmt.Sprintf("Unmatch element in line %d:", errLine)))
+		errLine := errTok.Line()
+		fmt.Println(utils.RedString(fmt.Sprintf("Unmatch element in line %d:", errLine)))
 		fmt.Println(lines[errLine-1])
 		return
 	}
@@ -54,10 +48,13 @@ func main() {
 	if !parserRes {
 		errTokenId := utils.TokenListDeepest - 1
 		errTok := tokenList.GetToken(errTokenId)
-		errLine := errTok.GetLine()
-		fmt.Println(redString(fmt.Sprintf("Syntax error in line %d:", errLine)))
+		errLine := errTok.Line()
+		fmt.Println(utils.RedString((fmt.Sprintf("Syntax error in line %d:", errLine))))
 		fmt.Println(lines[errLine-1])
 
 	}
+	fmt.Println("Sstack:", semantic.Sstack)
+	fmt.Println("QStack:", semantic.Qstack)
+	fmt.Println("Symbol Table:", semantic.RootSymbolTable.ListAll())
 
 }

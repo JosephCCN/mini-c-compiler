@@ -1,13 +1,15 @@
 package parser
 
 import (
+	"github.com/semantic"
 	"github.com/utils"
 )
 
 // this is the only export function
 func Start(tokList *utils.TokenList) bool {
-	res := ex_declaration(tokList) && start_(tokList)
-	return res && tokList.End()
+	// res := ex_declaration(tokList) && start_(tokList)
+	// return res && tokList.End()
+	return var_declaration(tokList)
 }
 
 func start_(tokList *utils.TokenList) bool {
@@ -183,14 +185,35 @@ func return_statement_sr(tokList *utils.TokenList) bool {
 }
 
 func var_declaration(tokList *utils.TokenList) bool {
-	return types(tokList) && assignment(tokList)
+	var tp utils.Token
+	if types(tokList) && tokList.Mark(&tp, tokList.Cursor()-1) && assignment(tokList) {
+		semantic.Sstack.Push(tp)
+		semantic.Sstack.Push(utils.GetToken("d+", "declaration", -1))
+		semantic.Action()
+		return true
+	}
+	return false
 }
 
 func assignment(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	if tokList.IsIdentifier() && tokList.Match("=") && expressions(tokList) {
-		return true
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var id utils.Token
+	if tokList.IsIdentifier() && tokList.Mark(&id, tokList.Cursor()-1) && tokList.Match("=") && expressions(tokList) {
+		semantic.Sstack.Push(id)
+		semantic.Sstack.Push(utils.GetToken("=", "operator", -1))
+		return semantic.Action()
 	}
 	*tokList = tmp
-	return tokList.IsIdentifier() && tokList.Match("=") && tokList.IsIdentifier()
+	*semantic.Qstack = tmpQ
+	*semantic.Sstack = tmpS
+	if tokList.IsIdentifier() && tokList.Mark(&id, tokList.Cursor()-1) && tokList.Match("=") && tokList.IsIdentifier() {
+		semantic.Sstack.Push(tokList.PrevToken())
+		semantic.Sstack.Push(id)
+		semantic.Sstack.Push(utils.GetToken("=", "operator", -1))
+		return semantic.Action()
+	} else {
+		return false
+	}
 }

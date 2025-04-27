@@ -15,6 +15,21 @@ func GetTokenList() TokenList {
 	return ret
 }
 
+func (self *TokenList) Mark(tok *Token, pos int) bool {
+	if pos < len(self.list) {
+		*tok = self.list[pos]
+		return true
+	}
+	return false
+}
+
+func (self *TokenList) At(pos int) Token {
+	if pos < len(self.list) {
+		return self.list[pos]
+	}
+	return Token{}
+}
+
 func (self *TokenList) PrevToken() Token {
 	if self.cur == 0 {
 		return Token{}
@@ -59,11 +74,11 @@ func (self *TokenList) GetToken(pos int) Token {
 	return self.list[pos]
 }
 
-func (self *TokenList) GetList() []Token {
+func (self *TokenList) List() []Token {
 	return self.list
 }
 
-func (self *TokenList) GetCursor() int {
+func (self *TokenList) Cursor() int {
 	return self.cur
 }
 

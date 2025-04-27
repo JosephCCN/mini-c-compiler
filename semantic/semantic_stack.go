@@ -17,10 +17,13 @@ func (s *SemanticStack) Push(tok utils.Token) {
 	s.stack = append(s.stack, tok)
 }
 
-func (s *SemanticStack) Pop() {
+func (s *SemanticStack) Pop() utils.Token {
+	var ret utils.Token
 	if len(s.stack) >= 1 {
+		ret = s.Top()
 		s.stack = s.stack[:len(s.stack)-1]
 	}
+	return ret
 }
 
 func (s *SemanticStack) Top() utils.Token {

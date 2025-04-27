@@ -1,4 +1,4 @@
-package utils
+package semantic
 
 type FunctionTableNode struct {
 	returnType    string
