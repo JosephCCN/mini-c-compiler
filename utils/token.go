@@ -28,6 +28,10 @@ func (tok Token) Type() string {
 	return tok.tokType
 }
 
+func (tok Token) ID() int {
+	return tok.id
+}
+
 func (tok Token) Match(content string) bool {
 	return tok.content == content
 }

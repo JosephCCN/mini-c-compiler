@@ -52,7 +52,11 @@ func (s *quadrupleStack) Top() quadruple {
 func (s *quadrupleStack) ListAll() string {
 	ret := ""
 	for _, q := range s.stack {
-		ret += fmt.Sprintf("(%s, %s, %s, %s)\n", q.op, q.var1, q.var2, q.res)
+		if q.op == "label" {
+			ret += fmt.Sprintf("%s:\n", q.res)
+		} else {
+			ret += fmt.Sprintf("(%s, %s, %s, %s)\n", q.op, q.var1, q.var2, q.res)
+		}
 	}
 	return ret
 }

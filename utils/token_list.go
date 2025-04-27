@@ -1,5 +1,7 @@
 package utils
 
+import "fmt"
+
 var TokenListDeepest int
 
 type TokenList struct {
@@ -110,4 +112,12 @@ func (self *TokenList) IsString() bool {
 func (self *TokenList) IsIdentifier() bool {
 	tok := self.Pop()
 	return tok.IsIdentifier()
+}
+
+func (self *TokenList) ListAll() string {
+	ret := ""
+	for _, t := range self.list {
+		ret += fmt.Sprintf("[%s, %s, %d]\n", t.content, t.tokType, t.id)
+	}
+	return ret
 }

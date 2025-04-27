@@ -1,6 +1,10 @@
 package semantic
 
-import "github.com/utils"
+import (
+	"fmt"
+
+	"github.com/utils"
+)
 
 type SemanticStack struct {
 	stack []utils.Token
@@ -31,4 +35,12 @@ func (s *SemanticStack) Top() utils.Token {
 		return s.stack[len(s.stack)-1]
 	}
 	return utils.Token{}
+}
+
+func (s *SemanticStack) ListAll() string {
+	ret := ""
+	for _, q := range s.stack {
+		ret += fmt.Sprintf("[%s, %s, %s]\n", q.Content(), q.Type(), q.ID())
+	}
+	return ret
 }

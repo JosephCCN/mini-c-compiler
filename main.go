@@ -3,10 +3,9 @@ package main
 import (
 	"flag"
 	"fmt"
-	"math/rand"
 	"os"
+	"path/filepath"
 	"strings"
-	"time"
 
 	"github.com/lexical"
 	"github.com/parser"
@@ -17,15 +16,24 @@ import (
 func main() {
 
 	semantic.Init()
-	rand.Seed(time.Now().UnixNano())
+	// rand.Seed(time.Now().UnixNano())
 
 	var srcPath string
+	var outputDir string
 	flag.StringVar(&srcPath, "s", "", "source file path")
+	flag.StringVar(&outputDir, "d", "", "destination")
 	flag.Parse()
 
 	if srcPath == "" {
-		fmt.Println("Missing source")
+		fmt.Println(utils.RedString("Missing source"))
 		return
+	}
+	if outputDir == "" {
+		fmt.Println(utils.RedString("Missing destination"))
+		return
+	}
+	if _, err := os.Stat(outputDir); os.IsNotExist(err) {
+		os.Mkdir(outputDir, 0777)
 	}
 
 	src, err := os.ReadFile(srcPath)
@@ -36,7 +44,8 @@ func main() {
 
 	tokenList, err := lexical.Run(string(src))
 	lines := strings.Split(string(src), "\n")
-	fmt.Println(tokenList)
+	os.WriteFile(filepath.Join(outputDir, "lexical"), []byte(tokenList.ListAll()), 0777)
+	// fmt.Println(tokenList.ListAll())
 	if err != nil {
 		lst := tokenList.List()
 		errTok := lst[len(lst)-1]
@@ -47,7 +56,7 @@ func main() {
 	}
 
 	parserRes := parser.Start(&tokenList)
-	fmt.Println(parserRes)
+	// fmt.Println(parserRes)
 	if !parserRes {
 		errTokenId := utils.TokenListDeepest - 1
 		errTok := tokenList.GetToken(errTokenId)
@@ -56,8 +65,11 @@ func main() {
 		fmt.Println(lines[errLine-1])
 
 	}
-	fmt.Println("Sstack:", semantic.Sstack)
-	fmt.Println("QStack:\n", semantic.Qstack.ListAll())
-	fmt.Println("Symbol Table:\n", semantic.RootSymbolTable.ListAll())
+	os.WriteFile(filepath.Join(outputDir, "sstack"), []byte(semantic.Sstack.ListAll()), 0777)
+	os.WriteFile(filepath.Join(outputDir, "result"), []byte(semantic.Qstack.ListAll()), 0777)
+	os.WriteFile(filepath.Join(outputDir, "symbolTable"), []byte(semantic.RootSymbolTable.ListAll()), 0777)
+	// fmt.Println("Sstack:", semantic.Sstack)
+	// fmt.Println("QStack:\n", semantic.Qstack.ListAll())
+	// fmt.Println("Symbol Table:\n", semantic.RootSymbolTable.ListAll())
 
 }

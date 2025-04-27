@@ -3,5 +3,5 @@ int tmp(int a) {
     for(int i=0;i<10;i = i + 1) {
         int b = a + 1;
     }
-    return c;
+    return a;
 }
