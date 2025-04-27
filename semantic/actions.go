@@ -10,22 +10,10 @@ func Action() bool {
 	op := Sstack.Pop()
 
 	switch op.Content() {
-	case "+":
+	case "+", "-", "*", "/", "&", "|", "^", "~", "&&", "||", ">", "<", ">=", "<=", "==":
 		v2 := Sstack.Pop()
 		v1 := Sstack.Pop()
-		return addition(v1, v2)
-	case "-":
-		v2 := Sstack.Pop()
-		v1 := Sstack.Pop()
-		return subtraction(v1, v2)
-	case "*":
-		v2 := Sstack.Pop()
-		v1 := Sstack.Pop()
-		return multiplication(v1, v2)
-	case "/":
-		v2 := Sstack.Pop()
-		v1 := Sstack.Pop()
-		return division(v1, v2)
+		return operator(v1, v2, op.Content())
 	case "=":
 		lvalue := Sstack.Pop()
 		rvalue := Sstack.Pop()
@@ -62,72 +50,18 @@ func typeConversion(t1 string, t2 string, op string) (string, error) {
 	return "", fmt.Errorf("cannot Convert %s and %s", t1, t2)
 }
 
-func addition(v1 utils.Token, v2 utils.Token) bool {
+func operator(v1 utils.Token, v2 utils.Token, op string) bool {
 	v1Type := getType(v1)
 	v2Type := getType(v2)
 
-	convertedType, err := typeConversion(v1Type, v2Type, "+")
+	convertedType, err := typeConversion(v1Type, v2Type, op)
 	if err != nil {
 		fmt.Println(utils.RedString(err.Error()))
 		return false
 		// os.Exit(0)
 	}
 	tok := utils.GetToken(fmt.Sprintf("t%d", nextT), convertedType, v1.Line())
-	q := GetQuadruple("+", v1.Content(), v2.Content(), tok.Content())
-	nextT += 1
-	Qstack.Push(q)
-	Sstack.Push(tok)
-	return true
-}
-
-func subtraction(v1 utils.Token, v2 utils.Token) bool {
-	v1Type := getType(v1)
-	v2Type := getType(v2)
-
-	convertedType, err := typeConversion(v1Type, v2Type, "-")
-	if err != nil {
-		fmt.Println(utils.RedString(err.Error()))
-		return false
-		// os.Exit(0)
-	}
-	tok := utils.GetToken(fmt.Sprintf("t%d", nextT), convertedType, v1.Line())
-	q := GetQuadruple("-", v1.Content(), v2.Content(), tok.Content())
-	nextT += 1
-	Qstack.Push(q)
-	Sstack.Push(tok)
-	return true
-}
-
-func multiplication(v1 utils.Token, v2 utils.Token) bool {
-	v1Type := getType(v1)
-	v2Type := getType(v2)
-
-	convertedType, err := typeConversion(v1Type, v2Type, "*")
-	if err != nil {
-		fmt.Println(utils.RedString(err.Error()))
-		return false
-		// os.Exit(0)
-	}
-	tok := utils.GetToken(fmt.Sprintf("t%d", nextT), convertedType, v1.Line())
-	q := GetQuadruple("*", v1.Content(), v2.Content(), tok.Content())
-	nextT += 1
-	Qstack.Push(q)
-	Sstack.Push(tok)
-	return true
-}
-
-func division(v1 utils.Token, v2 utils.Token) bool {
-	v1Type := getType(v1)
-	v2Type := getType(v2)
-
-	convertedType, err := typeConversion(v1Type, v2Type, "*")
-	if err != nil {
-		fmt.Println(utils.RedString(err.Error()))
-		return false
-		// os.Exit(0)
-	}
-	tok := utils.GetToken(fmt.Sprintf("t%d", nextT), convertedType, v1.Line())
-	q := GetQuadruple("*", v1.Content(), v2.Content(), tok.Content())
+	q := GetQuadruple(op, v1.Content(), v2.Content(), tok.Content())
 	nextT += 1
 	Qstack.Push(q)
 	Sstack.Push(tok)

@@ -7,10 +7,6 @@ import (
 
 func expressions(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	if math_experssion(tokList) {
-		return true
-	}
-	*tokList = tmp
 	if logic_experssion(tokList) {
 		return true
 	}
@@ -26,8 +22,7 @@ func math_experssion_(tokList *utils.TokenList) bool {
 	t := op1(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && math_experssion2(tokList)
 	if t {
 		semantic.Sstack.Push(op)
-		semantic.Action()
-		math_experssion_(tokList)
+		return semantic.Action() && math_experssion_(tokList)
 	} else {
 		*semantic.Qstack = tmpQ
 		*semantic.Sstack = tmpS
@@ -48,8 +43,7 @@ func math_experssion2_(tokList *utils.TokenList) bool {
 	t := op2(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && term(tokList)
 	if t {
 		semantic.Sstack.Push(op)
-		semantic.Action()
-		math_experssion2_(tokList)
+		return semantic.Action() && math_experssion2_(tokList)
 	} else {
 		*semantic.Qstack = tmpQ
 		*semantic.Sstack = tmpS
@@ -64,10 +58,17 @@ func math_experssion2(tokList *utils.TokenList) bool {
 
 func logic_experssion_(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	t := bool_op(tokList) && logic_experssion2(tokList)
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var op utils.Token
+	t := bool_op(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && logic_experssion2(tokList)
 	if t {
+		semantic.Sstack.Push(op)
+		semantic.Action()
 		logic_experssion_(tokList)
 	} else {
+		*semantic.Qstack = tmpQ
+		*semantic.Sstack = tmpS
 		*tokList = tmp
 	}
 	return true
@@ -75,19 +76,34 @@ func logic_experssion_(tokList *utils.TokenList) bool {
 
 func logic_experssion(tokList *utils.TokenList) bool {
 	tmp := *tokList
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
 	if logic_experssion2(tokList) && logic_experssion_(tokList) {
 		return true
 	}
 	*tokList = tmp
-	return tokList.Match("!") && logic_experssion(tokList) && logic_experssion_(tokList)
+	*semantic.Qstack = tmpQ
+	*semantic.Sstack = tmpS
+	var op utils.Token
+	if tokList.Match("!") && tokList.Mark(&op, tokList.Cursor()-1) && logic_experssion(tokList) && logic_experssion_(tokList) {
+		semantic.Sstack.Push(op)
+		return semantic.Action()
+	}
+	return false
 }
 
 func logic_experssion2_(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	t := bitwise_op(tokList) && logic_experssion3(tokList)
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var op utils.Token
+	t := bitwise_op(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && logic_experssion3(tokList)
 	if t {
-		logic_experssion2_(tokList)
+		semantic.Sstack.Push(op)
+		return semantic.Action() && logic_experssion2_(tokList)
 	} else {
+		*semantic.Qstack = tmpQ
+		*semantic.Sstack = tmpS
 		*tokList = tmp
 	}
 	return true
@@ -99,17 +115,23 @@ func logic_experssion2(tokList *utils.TokenList) bool {
 
 func logic_experssion3_(tokList *utils.TokenList) bool {
 	tmp := *tokList
-	t := cmp_op(tokList) && term(tokList)
+	tmpQ := *semantic.Qstack
+	tmpS := *semantic.Sstack
+	var op utils.Token
+	t := cmp_op(tokList) && tokList.Mark(&op, tokList.Cursor()-1) && math_experssion(tokList)
 	if t {
-		logic_experssion3_(tokList)
+		semantic.Sstack.Push(op)
+		return semantic.Action() && logic_experssion3_(tokList)
 	} else {
+		*semantic.Qstack = tmpQ
+		*semantic.Sstack = tmpS
 		*tokList = tmp
 	}
 	return true
 }
 
 func logic_experssion3(tokList *utils.TokenList) bool {
-	return term(tokList) && logic_experssion3_(tokList)
+	return math_experssion(tokList) && logic_experssion3_(tokList)
 }
 
 func term(tokList *utils.TokenList) bool {

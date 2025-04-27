@@ -60,9 +60,20 @@ func conversionInit() {
 	}
 
 	TypeConvert = map[string]map[string]map[string]string{
-		"+": plus,
-		"-": plus, // the type conversion rule is the same as addition
-		"*": multiply,
-		"/": multiply, // the type conversion rule is the same as multiplication
+		"+":  plus,
+		"-":  plus, // the type conversion rule is the same as addition
+		"*":  multiply,
+		"/":  multiply, // the type conversion rule is the same as multiplication
+		"&&": plus,
+		"||": plus,
+		"<":  plus,
+		">":  plus,
+		">=": plus,
+		"<=": plus,
+		"==": plus,
+		"&":  plus,
+		"|":  plus,
+		"^":  plus,
+		"~":  plus,
 	}
 }
